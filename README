@@ -1,56 +1,109 @@
-File::Which
-===========
+NAME
+    File::Which - Portable implementation of the `which' utility
 
-File::Which is a portable implementation (in Perl) of `which', and can
-be used to get the absolute filename of an executable program
-installed somewhere in your PATH, or just check for its existence. It
-includes the command-line utility `pwhich' which has the same function
-as `which'.
+SYNOPSIS
+      use File::Which;                  # exports which()
+      use File::Which qw(which where);  # exports which() and where()
+      
+  my $exe_path = which('perldoc');
+      
+  my @paths = where('perl');
+      - Or -
+      my @paths = which('perl'); # an array forces search for all of them
 
-INSTALLATION
+DESCRIPTION
+    "File::Which" was created to be able to get the paths to executable
+    programs on systems under which the `which' program wasn't implemented
+    in the shell.
 
-To install this module type the following (on Windows, use `nmake',
-which can be obtained freely from Microsoft: see ActivePerl
-documentation):
+    "File::Which" searches the directories of the user's "PATH" (as returned
+    by "File::Spec->path()"), looking for executable files having the name
+    specified as a parameter to "which()". Under Win32 systems, which do not
+    have a notion of directly executable files, but uses special extensions
+    such as ".exe" and ".bat" to identify them, "File::Which" takes extra
+    steps to assure that you will find the correct file (so for example, you
+    might be searching for "perl", it'll try perl.exe, perl.bat, etc.)
 
-   $ tar zxvf File-Which-x.xx.tar.gz  (replace x.xx with the correct version number)
-   $ cd File-Which-x.xx
-   $ perl Makefile.PL
-   $ make
-   $ make test
-   $ make install
+Steps Used on Win32, DOS, OS2 and VMS
+  Windows NT
+    Windows NT has a special environment variable called "PATHEXT", which is
+    used by the shell to look for executable files. Usually, it will contain
+    a list in the form ".EXE;.BAT;.COM;.JS;.VBS" etc. If "File::Which" finds
+    such an environment variable, it parses the list and uses it as the
+    different extensions.
 
-Using the CPAN shell:
+  Windows 9x and other ancient Win/DOS/OS2
+    This set of operating systems don't have the "PATHEXT" variable, and
+    usually you will find executable files there with the extensions ".exe",
+    ".bat" and (less likely) ".com". "File::Which" uses this hardcoded list
+    if it's running under Win32 but does not find a "PATHEXT" variable.
 
-   $ perl -MCPAN -eshell
-   cpan> install File::Which
-   cpan> exit
+  VMS
+    Same case as Windows 9x: uses ".exe" and ".com" (in that order).
 
-TESTING
+Functions
+  which($short_exe_name)
+    Exported by default.
 
-When you run `make test', File::Which will test some of its
-functionality. It uses the t/test-bin/ directory for this, treating
-the files below it as programs.
+    $short_exe_name is the name used in the shell to call the program (for
+    example, "perl").
 
-The tests might still be a bit shaky because there is a bit of magic
-involved in doing this -- please report any problems you might have.
+    If it finds an executable with the name you specified, "which()" will
+    return the absolute path leading to this executable (for example,
+    /usr/bin/perl or C:\Perl\Bin\perl.exe).
 
-Furthermore, the files under t/test-bin/ are *not* supposed to be
-executed: do so at your own risk. Especially, the *.exe files are not
-valid applications as they aren't compiled and might make your system
-crash or whatever. Execute them at your own risk. (But don't worry,
-this package doesn't bite otherwise :)
+    If it does *not* find the executable, it returns "undef".
 
-DEPENDENCIES
+    If "which()" is called in list context, it will return *all* the
+    matches.
 
-This module requires these other modules and libraries:
+  where($short_exe_name)
+    Not exported by default.
 
-  File::Spec - distributed with perl.
+    Same as "which($short_exe_name)" in array context. Same as the `where'
+    utility, will return an array containing all the path names matching
+    $short_exe_name.
 
-COPYRIGHT AND LICENCE
+BUGS AND CAVEATS
+    Not tested on VMS or MacOS, although there is platform specific code for
+    those. Anyone who haves a second would be very kind to send me a report
+    of how it went.
 
-Copyright (C) 2002 Per Einar Ellefsen <per.einar (at) skynet.be>
+    File::Spec adds the current directory to the front of PATH if on Win32,
+    VMS or MacOS. I have no knowledge of those so don't know if the current
+    directory is searced first or not. Could someone please tell me?
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-Which>
+
+    For other issues, contact the maintainer.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+    Per Einar Ellefsen <pereinar@cpan.org>
+
+    Originated in modperl-2.0/lib/Apache/Build.pm. Changed for use in DocSet
+    (for the mod_perl site) and Win32-awareness by me, with slight
+    modifications by Stas Bekman, then extracted to create "File::Which".
+
+    Version 0.04 had some significant platform-related changes, taken from
+    the Perl Power Tools `which' implementation by Abigail with enhancements
+    from Peter Prymmer. See
+    <http://www.perl.com/language/ppt/src/which/index.html> for more
+    information.
+
+COPYRIGHT
+    Copyright 2002 Per Einar Ellefsen.
+
+    Some parts copyright 2009 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    File::Spec, which(1), Perl Power Tools:
+    <http://www.perl.com/language/ppt/index.html>.
 
