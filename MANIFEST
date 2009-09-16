@@ -8,6 +8,7 @@ script/pwhich
 t/01_compile.t
 t/02_all.t
 t/03_simple.t
+t/04_pwhich.t
 t/97_meta.t
 t/98_pod.t
 t/99_pmv.t
