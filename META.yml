@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               File-Which
-version:            1.08
+version:            1.09
 abstract:           Portable implementation of the "which" utility
 author:
     - Adam Kennedy <adamk@cpan.org>
